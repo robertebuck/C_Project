@@ -1,6 +1,7 @@
 // Builds upon OptionData.hpp file given in class.
 // Addition of two new classes and two new payoffs to the function myPayOffFunction
 
+
 #ifndef OptionData_HPP
 #define OptionData_HPP
 
@@ -34,9 +35,15 @@ struct OptionData
 	// Extra data 
 	double D; // dividend
 
+	// constructor
 	explicit constexpr OptionData(double strike, double expiration, double interestRate,
 									double volatility, double dividend, int PC)
 		: K(strike), T(expiration), r(interestRate), sig(volatility), D(dividend), type(PC)
+	{}
+
+	//copy constructor
+	explicit constexpr OptionData(const OptionData& copy)
+		: K(copy.K), T(copy.T), r(copy.r), sig(copy.sig), D(copy.D), type(copy.type)
 	{}
 	
 	template <typename ArgPack> OptionData(const ArgPack& args)
@@ -47,9 +54,6 @@ struct OptionData
 		sig = args[OptionParams::volatility];
 		D = args[OptionParams::dividend];
 		type = args[OptionParams::optionType];
-
-		std::cout << "K " << K << ", T " << T << ",r " << r << std::endl;
-		std::cout << "vol " << sig << ", div " << D << ",type " << type << std::endl;
 	}
 
 	// Payoff function

@@ -1,8 +1,8 @@
 // OptionCommand.hpp
 // Taken directly from OptionCommand.hpp file given in class.
 // Small modifications made moving the N and n fucntions to Functions.hpp and Functions.cpp
-// and making the output from each execute command a double so that comparision for European
-// options to double can be made easier.
+// and making the output from each execute command a double so that comparision  of simulated price
+// for European options can be made easier.
 // Note not seperated into hpp and cpp file as use of Black Scholes formula to compute European
 // option prices is outside the scope of Section D of the project.
 

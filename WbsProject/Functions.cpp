@@ -2,8 +2,9 @@
 
 #include "Functions.hpp"
 
-    std::default_random_engine dre;
-    std::normal_distribution<double> nor(0.0, 1.0);
+// gloabl variable may be a problem 
+std::default_random_engine dre;
+std::normal_distribution<double> nor(0.0, 1.0);
 void generateRN(std::vector<double>& v)
 {
     // loop to generate vector of standard normal random numbers
@@ -54,7 +55,6 @@ void data_output_exact1(std::vector<std::vector<double>> temp, long NSIM, long N
     }
 }
 
-
 void data_output_exact2(std::vector<std::vector<double>> temp, long NSIM, long NT)
 { //Creating excel file for paths from exact simulation
     std::ofstream out("paths_exact2.csv");
@@ -69,4 +69,48 @@ void data_output_exact2(std::vector<std::vector<double>> temp, long NSIM, long N
     }
 }
 
+void data_output_euler_range(std::vector<std::vector<double>> temp, std::vector<double> S, int f)
+{ //Creating excel file for paths from euler simulation
+    std::ofstream out("Euler_price_range.csv");
+    // looping through paths to output in excel
+    for (size_t i = 0; i < temp.size(); i++)
+    {
+        out << S[i] << ',';
+        for (int j = 0; j < f; j++)
+        {
+            out << temp[i][j] << ',';
+        }
+        out << '\n';
+    }
+}
+
+void data_output_exact1_range(std::vector<std::vector<double>> temp, std::vector<double> S, int f)
+{ //Creating excel file for paths from exact1 simulation
+    std::ofstream out("Exact1_price_range.csv");
+    // looping through paths to output in excel
+    for (size_t i = 0; i < temp.size(); i++)
+    {
+        out << S[i] << ',';
+        for (int j = 0; j < f; j++)
+        {
+            out << temp[i][j] << ',';
+        }
+        out << '\n';
+    }
+}
+
+void data_output_exact2_range(std::vector<std::vector<double>> temp, std::vector<double> S, int f)
+{ //Creating excel file for paths from exact1 simulation
+    std::ofstream out("Exact2_price_range.csv");
+    // looping through paths to output in excel
+    for (size_t i = 0; i < temp.size(); i++)
+    {
+        out << S[i] << ',';
+        for (int j = 0; j < f; j++)
+        {
+            out << temp[i][j] << ',';
+        }
+        out << '\n';
+    }
+}
 

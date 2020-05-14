@@ -4,7 +4,7 @@
 int main()
 {
 	double S_0 = 25; // Spot price
-	long NSIM = 100; // Number of simulations
+	long NSIM = 1000; // Number of simulations
 	long NT = 1000; // Number of time steps
 
 	// imputting parameters of the option using boost library
@@ -12,7 +12,7 @@ int main()
 		OptionParams::volatility = 0.3, OptionParams::dividend = 0.0,
 		OptionParams::optionType = 1, OptionParams::interestRate = 0.08));
 
-	int M = 10000; // number of times running the member functions
+	int M = 1000; // number of times running the member functions
 	MonteCarlo Mc(myOption, NSIM, NT, S_0);
 	std::vector<double> avgvalue_euler(4); //vector of the average value of the member function "Euler" output
 	std::vector<double> avgvalue_exact1(4); //vector of the average value of the member function "Exact1" output

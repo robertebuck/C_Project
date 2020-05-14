@@ -10,7 +10,7 @@
 #include "SDE.hpp"
 #include "Stopwatch.cpp"
 #include <omp.h>
-#include "Functions.hpp"
+#include "OptionCommand.hpp"
 
 
 class MonteCarlo
@@ -29,13 +29,19 @@ public:
 	MonteCarlo(const MonteCarlo& Mc); // copy constructor
 	~MonteCarlo(); // detructor
 
-	// Functions
+	// SImulations for a single spot price
 	std::vector<double> Euler();
 	std::vector<double> Exact1();
 	std::vector<double> Exact2();
 	void Euler_excel();
 	void Exact1_excel();
 	void Exact2_excel();
+
+	// Simulations for a range of spot prices
+	std::vector<std::vector<double>> Euler(double S_start, double S_end, int grid_size);
+	std::vector<std::vector<double>> Exact1(double S_start, double S_end, int grid_size);
+	std::vector<std::vector<double>> Exact2(double S_start, double S_end, int grid_size);
+
 };
 
 #endif

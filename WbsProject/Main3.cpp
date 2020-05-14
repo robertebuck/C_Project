@@ -1,11 +1,12 @@
 #include "MonteCarlo.hpp"
 #include "OptionCommand.hpp"
+#include <iomanip>
 
 int main()
 {
 	double S_start;
 	double S_end;
-	double increments;
+	int grid_size;
 	double k;
 	double T;
 	double sig;
@@ -15,9 +16,6 @@ int main()
 	long NSIM;
 	long NT;
 	int s;
-	std::vector<double> prices; // vector of prices for each spot
-	std::vector<double> underlying; // vector of underlying value
-	std::vector<double> bsprice; // vector of Black Scholes price for each underlying value
 
 	std::cout << "Imput option parameters \n";
 	std::cout << "Strike: ";
@@ -40,8 +38,8 @@ int main()
 	std::cin >> S_start;
 	std::cout << "End of underlying value: ";
 	std::cin >> S_end;
-	std::cout << "Incremental increase in underlying value: ";
-	std::cin >> increments;
+	std::cout << "grid size: ";
+	std::cin >> grid_size;
 	std::cout << "Number of simulations: ";
 	std::cin >> NSIM;
 	std::cout << "Number of time steps: ";
@@ -50,222 +48,148 @@ int main()
 	std::cin >> s;
 	std::cout << std::endl;
 
-	// for European put option i.e type == 2
-	if (type == 2)
-	{ // for "Exact1" i.e. s == 2 simulation
-		if (s == 2)
-		{ // looping through all the underlying values
-			for (double i = S_start; i <= S_end; i += increments)
-			{
-				MonteCarlo Mc(myOption, NSIM, NT, i);
-				PutPrice blackput = PutPrice(myOption.K, myOption.T, myOption.r, myOption.D, myOption.sig);
-				prices.push_back(Mc.Exact1()[0]);
-				underlying.push_back(i);
-				bsprice.push_back(blackput.execute(i));
-			}
-			// saving output of underlying, simulated prices and the Black-Scholes price in an excel file
-			std::ofstream out("Price_range_exact1.csv");
-			for (std::size_t j = 0; j < prices.size(); j++)
-			{
-				out << underlying[j] << ',' << prices[j] << ',' << bsprice[j] << '\n';
-			}
-		}
-		// for "Exact2" i.e. s == 3 simulation
-		else if (s == 3)
-		{// looping through all the underlying values
-			for (double i = S_start; i <= S_end; i += increments)
-			{
-				MonteCarlo Mc(myOption, NSIM, NT, i);
-				PutPrice blackput = PutPrice(myOption.K, myOption.T, myOption.r, myOption.D, myOption.sig);
-				prices.push_back(Mc.Exact2()[0]);
-				underlying.push_back(i);
-				bsprice.push_back(blackput.execute(i));
-			}
-			// saving output of underlying, simulated prices and the Black-Scholes price in an excel file
-			std::ofstream out("Price_range_exact2.csv");
-			for (std::size_t j = 0; j < prices.size(); j++)
-			{
-				out << underlying[j] << ',' << prices[j] << ',' << bsprice[j] << '\n';
-			}
-		}
-		// for "Euler" simulation i.e. s == 1 or just s not = 2 or 3
-		else
-		{// looping through all the underlying values
-			for (double i = S_start; i <= S_end; i += increments)
-			{
-				MonteCarlo Mc(myOption, NSIM, NT, i);
-				PutPrice blackput = PutPrice(myOption.K, myOption.T, myOption.r, myOption.D, myOption.sig);
-				prices.push_back(Mc.Euler()[0]);
-				underlying.push_back(i);
-				bsprice.push_back(blackput.execute(i));
-			}
-			// saving output of underlying, simulated prices and the Black-Scholes price in an excel file
-			std::ofstream out("Price_range_euler.csv");
-			for (std::size_t j = 0; j < prices.size(); j++)
-			{
-				out << underlying[j] << ',' << prices[j] << ',' << bsprice[j] << '\n';
-			}
-		}
-	}
-	// for Antithetic Asian call option i.e. type == 3
-	else if (type == 3)
-	{// for "Exact1" i.e. s == 2 simulation
-		if (s == 2)
-		{// looping through all the underlying values
-			for (double i = S_start; i <= S_end; i += increments)
-			{
-				MonteCarlo Mc(myOption, NSIM, NT, i);
-				prices.push_back(Mc.Exact1()[0]);
-				underlying.push_back(i);
-			}
-			// saving output of underlying, simulated prices and the Black-Scholes price in an excel file
-			std::ofstream out("Price_range_exact1.csv");
-			for (std::size_t j = 0; j < prices.size(); j++)
-			{
-				out << underlying[j] << ',' << prices[j] << '\n';
-			}
-		}
-		// for "Exact2" i.e. s == 3 simulation
-		else if (s == 3)
-		{// looping through all the underlying values
-			for (double i = S_start; i <= S_end; i += increments)
-			{
-				MonteCarlo Mc(myOption, NSIM, NT, i);
-				prices.push_back(Mc.Exact2()[0]);
-				underlying.push_back(i);
-			}
-			// saving output of underlying, simulated prices and the Black-Scholes price in an excel file
-			std::ofstream out("Price_range_exact2.csv");
-			for (std::size_t j = 0; j < prices.size(); j++)
-			{
-				out << underlying[j] << ',' << prices[j] << '\n';
-			}
-		}
-		// for "Euler" simulation i.e. s == 1 or just s not = 2 or 3
-		else
-		{// looping through all the underlying values
-			for (double i = S_start; i <= S_end; i += increments)
-			{
-				MonteCarlo Mc(myOption, NSIM, NT, i);
-				prices.push_back(Mc.Euler()[0]);
-				underlying.push_back(i);
-			}
-			// saving output of underlying, simulated prices and the Black-Scholes price in an excel file
-			std::ofstream out("Price_range_euler.csv");
-			for (std::size_t j = 0; j < prices.size(); j++)
-			{
-				out << underlying[j] << ',' << prices[j] << '\n';
-			}
-		}
-	}
-	// For Antithetic Asian put options i.e. type == 4
-	else if (type == 4)
-	{// for "Exact1" i.e. s == 2 simulation
-		if (s == 2)
-		{// looping through all the underlying values
-			for (double i = S_start; i <= S_end; i += increments)
-			{
-				MonteCarlo Mc(myOption, NSIM, NT, i);
-				prices.push_back(Mc.Exact1()[0]);
-				underlying.push_back(i);
-			}
-			// saving output of underlying, simulated prices and the Black-Scholes price in an excel file
-			std::ofstream out("Price_range_exact1.csv");
-			for (std::size_t j = 0; j < prices.size(); j++)
-			{
-				out << underlying[j] << ',' << prices[j] << '\n';
-			}
-		}
-		// for "Exact2" i.e. s == 3 simulation
-		else if (s == 3)
-		{// looping through all the underlying values
-			for (double i = S_start; i <= S_end; i += increments)
-			{
-				MonteCarlo Mc(myOption, NSIM, NT, i);
-				prices.push_back(Mc.Exact2()[0]);
-				underlying.push_back(i);
-			}
-			// saving output of underlying, simulated prices and the Black-Scholes price in an excel file
-			std::ofstream out("Price_range_exact2.csv");
-			for (std::size_t j = 0; j < prices.size(); j++)
-			{
-				out << underlying[j] << ',' << prices[j] << '\n';
-			}
-		}
-		// for "Euler" simulation i.e. s == 1 or just s not = 2 or 3
-		else
-		{// looping through all the underlying values
-			for (double i = S_start; i <= S_end; i += increments)
-			{
-				MonteCarlo Mc(myOption, NSIM, NT, i);
-				prices.push_back(Mc.Euler()[0]);
-				underlying.push_back(i);
-			}
-			// saving output of underlying, simulated prices and the Black-Scholes price in an excel file
-			std::ofstream out("Price_range_euler.csv");
-			for (std::size_t j = 0; j < prices.size(); j++)
-			{
-				out << underlying[j] << ',' << prices[j] << '\n';
-			}
-		}
-	}
-	// For European call option i.e. type == 1 or just type not == 2,3 or 4
-	else
-	{// for "Exact1" i.e. s == 2 simulation
-		if (s == 2)
-		{// looping through all the underlying values
-			for (double i = S_start; i <= S_end; i += increments)
-			{
-				MonteCarlo Mc(myOption, NSIM, NT, i);
-				CallPrice blackcall = CallPrice(myOption.K, myOption.T, myOption.r, myOption.D, myOption.sig);
-				prices.push_back(Mc.Exact1()[0]);
-				underlying.push_back(i);
-				bsprice.push_back(blackcall.execute(i));
-			}
-			// saving output of underlying, simulated prices and the Black-Scholes price in an excel file
-			std::ofstream out("Price_range_exact1.csv");
-			for (std::size_t j = 0; j < prices.size(); j++)
-			{
-				out << underlying[j] << ',' << prices[j] << ',' << bsprice[j] << '\n';
-			}
-		}
-		// for "Exact2" i.e. s == 3 simulation
-		else if (s == 3)
-		{// looping through all the underlying values
-			for (double i = S_start; i <= S_end; i += increments)
-			{
-				MonteCarlo Mc(myOption, NSIM, NT, i);
-				CallPrice blackcall = CallPrice(myOption.K, myOption.T, myOption.r, myOption.D, myOption.sig);
-				prices.push_back(Mc.Exact2()[0]);
-				underlying.push_back(i);
-				bsprice.push_back(blackcall.execute(i));
-			}
-			// saving output of underlying, simulated prices and the Black-Scholes price in an excel file
-			std::ofstream out("Price_range_exact2.csv");
-			for (std::size_t j = 0; j < prices.size(); j++)
-			{
-				out << underlying[j] << ',' << prices[j] << ',' << bsprice[j] << '\n';
-			}
-		}
-		// for "Euler" simulation i.e. s == 1 or just s not = 2 or 3
-		else
-		{// looping through all the underlying values
-			for (double i = S_start; i <= S_end; i += increments)
-			{
-				MonteCarlo Mc(myOption, NSIM, NT, i);
-				CallPrice blackcall = CallPrice(myOption.K, myOption.T, myOption.r, myOption.D, myOption.sig);
-				prices.push_back(Mc.Euler()[0]);
-				underlying.push_back(i);
-				bsprice.push_back(blackcall.execute(i));
-			}
-			// saving output of underlying, simulated prices and the Black-Scholes price in an excel file
-			std::ofstream out("Price_range_euler.csv");
-			for (std::size_t j = 0; j < prices.size(); j++)
-			{
-				out << underlying[j] << ',' << prices[j] << ',' << bsprice[j] << '\n';
-			}
-		}
+	double ds = (S_end - S_start) / static_cast<double>(grid_size); // incremental increase in grid size
+	std::vector<double> underlying(grid_size+1); // vector of underlying value
 
+	// computing the underlying values
+	underlying[0] = S_start;
+	for (int i = 0; i < grid_size; i++)
+	{
+		underlying[i + 1] = underlying[i] + ds;
 	}
+
+	MonteCarlo MC(myOption, NSIM, NT, S_start);
+
+	// ensuring the ouput on the console is clear
+	const char separator = ' ';
+	const int Width = 20;
+
+	// Conditional to ensure the correct simulation type occurs i.e. s==1 euler, s==2 Exact1, s==3 Exact2, anytihing else returns "Incorrect choice of simulation type"
+	if (s == 1)
+	{
+		std::vector<std::vector<double>> V = MC.Euler(S_start, S_end, grid_size);
+		// Loop to ensure console output includes BS price if applicable i.e. BS price will be displayed if V[0].size() == 5
+		if (V[0].size() == 5)
+		{
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Underlying";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Simulated price";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Variance";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Standard error";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "time";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "BS price" << "\n\n";
+
+			for (int i = 0; i < grid_size+1; i++)
+			{
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << underlying[i];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][0];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][1];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][2];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][3];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][4] << "\n";
+			}
+		}
+		else
+		{
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Underlying";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Simulated price";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Variance";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Standard error";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "time" << "\n\n";
+
+			for (int i = 0; i < grid_size+1; i++)
+			{
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << underlying[i];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][0];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][1];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][2];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][3] << "\n";
+			}
+		}	
+	}
+	else if (s == 2)
+	{
+		std::vector<std::vector<double>> V = MC.Exact1(S_start, S_end, grid_size);
+		if (V[0].size() == 5)
+		{
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Underlying";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Simulated price";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Variance";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Standard error";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "time";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "BS price" << "\n\n";
+
+			for (int i = 0; i < grid_size + 1; i++)
+			{
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << underlying[i];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][0];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][1];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][2];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][3];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][4] << "\n";
+			}
+		}
+		else
+		{
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Underlying";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Simulated price";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Variance";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Standard error";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "time" << "\n\n";
+
+			for (int i = 0; i < grid_size + 1; i++)
+			{
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << underlying[i];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][0];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][1];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][2];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][3] << "\n";
+			}
+		}
+	}
+	else if (s == 3)
+	{
+		std::vector<std::vector<double>> V = MC.Exact2(S_start, S_end, grid_size);
+		if (V[0].size() == 5)
+		{
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Underlying";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Simulated price";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Variance";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Standard error";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "time";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "BS price" << "\n\n";
+
+			for (int i = 0; i < grid_size + 1; i++)
+			{
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << underlying[i];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][0];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][1];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][2];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][3];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][4] << "\n";
+			}
+		}
+		else
+		{
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Underlying";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Simulated price";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Variance";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "Standard error";
+			std::cout << std::left << std::setw(Width) << std::setfill(separator) << "time" << "\n\n";
+
+			for (int i = 0; i < grid_size + 1; i++)
+			{
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << underlying[i];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][0];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][1];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][2];
+				std::cout << std::left << std::setw(Width) << std::setfill(separator) << V[i][3] << "\n";
+			}
+		}
+	}
+	else
+	{
+	std::cout << "Incorrect choice of simulation type" << std::endl;
+	}
+
 	return 0;
 }
